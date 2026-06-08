@@ -1,0 +1,60 @@
+{
+  "name": "vitest-feishu-reporter",
+  "version": "1.0.0",
+  "description": "Send Vitest test failures to Feishu (Lark)",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.14.0",
+  "homepage": "https://github.com/justjavac/vitest-feishu-reporter",
+  "bugs": "https://github.com/justjavac/vitest-feishu-reporter/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justjavac/vitest-feishu-reporter.git"
+  },
+  "scripts": {
+    "prebuild": "rm -rf ./dist",
+    "build": "tsc --project tsconfig.prod.json",
+    "start": "vitest --update",
+    "lint": "eslint . --max-warnings 0 && publint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "validate": "pnpm build && pnpm lint && pnpm typecheck && pnpm test run"
+  },
+  "peerDependencies": {
+    "vitest": ">=3"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "@types/eslint": "^9.6.1",
+    "@types/node": "^25.9.2",
+    "@vitest/coverage-v8": "4.1.8",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-unicorn": "^65.0.0",
+    "prettier": "^3.8.3",
+    "publint": "^0.3.21",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  },
+  "keywords": [
+    "vitest",
+    "vitest-reporter",
+    "feishu",
+    "lark",
+    "test"
+  ],
+  "prettier": {},
+  "license": "MIT"
+}
