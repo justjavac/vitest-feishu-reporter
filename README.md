@@ -17,18 +17,18 @@ pnpm add -D vitest-feishu-reporter
 在 `vitest.config.ts` 中配置：
 
 ```ts
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     reporters: [
-      'default',
+      "default",
       // ... other reporters
       [
-        'vitest-feishu-reporter',
+        "vitest-feishu-reporter",
         {
-          token: 'xxxxxx-xxxxxxx-xxxx-xxxx',
-          secret: 'xxxxxxx',
+          token: "xxxxxx-xxxxxxx-xxxx-xxxx",
+          secret: "xxxxxxx",
         },
       ],
     ],
@@ -62,7 +62,7 @@ https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx
 export default defineConfig({
   test: {
     reporters: [
-      ['vitest-feishu-reporter', { silent: true }],
+      ["vitest-feishu-reporter", { silent: true }],
     ],
   },
 });

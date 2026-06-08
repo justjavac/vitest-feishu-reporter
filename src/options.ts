@@ -15,18 +15,18 @@ export function resolveOptions(
   options?: Partial<FeishuReporterOptions>,
 ): Required<FeishuReporterOptions> {
   const token =
-    process.env['VITEST_FEISHU_TOKEN'] ??
-    process.env['npm_package_vitest_feishu_token'] ??
+    process.env["VITEST_FEISHU_TOKEN"] ??
+    process.env["npm_package_vitest_feishu_token"] ??
     options?.token;
 
   const secret =
-    process.env['VITEST_FEISHU_SECRET'] ??
-    process.env['npm_package_vitest_feishu_secret'] ??
+    process.env["VITEST_FEISHU_SECRET"] ??
+    process.env["npm_package_vitest_feishu_secret"] ??
     options?.secret;
 
   return {
-    token: token ?? '',
-    secret: secret ?? '',
+    token: token ?? "",
+    secret: secret ?? "",
     silent: options?.silent ?? false,
   };
 }
