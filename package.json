@@ -3,23 +3,35 @@
   "version": "1.0.0",
   "description": "Send Vitest test failures to Feishu (Lark)",
   "type": "module",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"
   },
   "packageManager": "pnpm@10.14.0",
   "homepage": "https://github.com/justjavac/vitest-feishu-reporter",
-  "bugs": "https://github.com/justjavac/vitest-feishu-reporter/issues",
+  "bugs": {
+    "url": "https://github.com/justjavac/vitest-feishu-reporter/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/justjavac/vitest-feishu-reporter.git"
   },
+  "author": "迷渡 <justjavac@gmail.com>",
   "scripts": {
-    "prebuild": "node -e \"require('fs').rmSync('./dist', {recursive: true, force: true})\"",
+    "prebuild": "node --input-type=module -e \"import {rm} from 'node:fs/promises'; await rm('./dist', {recursive: true, force: true})\"",
     "build": "tsc --project tsconfig.prod.json",
     "dev": "vitest",
     "lint": "oxlint . && publint",
@@ -47,6 +59,6 @@
     "lark",
     "test"
   ],
-  "prettier": {},
+  "sideEffects": false,
   "license": "MIT"
 }
