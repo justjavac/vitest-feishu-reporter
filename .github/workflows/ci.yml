@@ -46,6 +46,9 @@ jobs:
         run: pnpm run typecheck
 
       - name: Test
+        env:
+          VITEST_FEISHU_TOKEN: ${{ secrets.VITEST_FEISHU_TOKEN }}
+          VITEST_FEISHU_SECRET: ${{ secrets.VITEST_FEISHU_SECRET }}
         run: pnpm run test run --coverage
 
       - name: Upload coverage
