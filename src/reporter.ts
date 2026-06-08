@@ -1,11 +1,16 @@
-import { relative } from 'node:path';
-import type { Reporter, TestCase, TestModule, Vitest } from 'vitest/node';
+import path from "node:path";
+import type {
+  Reporter,
+  TestCase,
+  TestModule,
+  TestResultFailed,
+  Vitest,
+} from "vitest/node";
 
-import { sendMessage, type CardElement } from './feishu.js';
-import { resolveOptions, type FeishuReporterOptions } from './options.js';
+import { sendMessage, type CardElement } from "./feishu.js";
+import { resolveOptions, type FeishuReporterOptions } from "./options.js";
 
-export interface FeishuReporterConstructorOptions
-  extends Partial<FeishuReporterOptions> {}
+export type FeishuReporterConstructorOptions = Partial<FeishuReporterOptions>;
 
 /**
  * Vitest reporter that sends test failure summaries to Feishu (Lark).
@@ -33,14 +38,14 @@ export default class FeishuReporter implements Reporter {
     this.options = resolveOptions(options);
   }
 
-  onInit(ctx: Vitest) {
-    this.ctx = ctx;
+  onInit(context: Vitest) {
+    this.ctx = context;
   }
 
   async onTestRunEnd(testModules: ReadonlyArray<TestModule>) {
     if (!this.options.token) {
       if (!this.options.silent) {
-        this.ctx.logger.error('vitest-feishu-reporter: token is required');
+        this.ctx.logger.error("vitest-feishu-reporter: token is required");
       }
       return;
     }
@@ -58,7 +63,7 @@ export default class FeishuReporter implements Reporter {
       await sendMessage(this.options.token, this.options.secret, elements);
 
       if (!this.options.silent) {
-        this.ctx.logger.log('Feishu report sent successfully 🎉');
+        this.ctx.logger.log("Feishu report sent successfully 🎉");
       }
     } catch (error) {
       if (!this.options.silent) {
@@ -76,9 +81,9 @@ export default class FeishuReporter implements Reporter {
 
     for (const testModule of testModules) {
       for (const test of testModule.children.allTests()) {
-        if (test.state() === 'failed') {
+        if (test.result().state === "failed") {
           failedTests.push({
-            filePath: relative(process.cwd(), testModule.moduleId),
+            filePath: path.relative(process.cwd(), testModule.moduleId),
             test,
           });
         }
@@ -92,7 +97,7 @@ export default class FeishuReporter implements Reporter {
     let count = 0;
 
     for (const testModule of testModules) {
-      count += testModule.children.allTests().length;
+      count += [...testModule.children.allTests()].length;
     }
 
     return count;
@@ -104,13 +109,13 @@ export default class FeishuReporter implements Reporter {
   ): CardElement[] {
     const elements: CardElement[] = [
       {
-        tag: 'div',
+        tag: "div",
         text: {
           content: `共执行了 ${totalTests} 个测试，其中 **${failedTests.length}** 个失败`,
-          tag: 'lark_md',
+          tag: "lark_md",
         },
       },
-      { tag: 'hr' },
+      { tag: "hr" },
     ];
 
     for (const { filePath, test } of failedTests) {
@@ -118,10 +123,10 @@ export default class FeishuReporter implements Reporter {
       const errorMessage = this.formatErrorMessage(test);
 
       elements.push({
-        tag: 'div',
+        tag: "div",
         text: {
           content: `**${filePath}**\n${testName}\n${errorMessage}`,
-          tag: 'lark_md',
+          tag: "lark_md",
         },
       });
     }
@@ -133,34 +138,49 @@ export default class FeishuReporter implements Reporter {
     const names: string[] = [test.name];
     let parent = test.parent;
 
-    while (parent && parent.type === 'suite' && parent.name) {
+    while (parent && parent.type === "suite" && parent.name) {
       names.unshift(parent.name);
       parent = parent.parent;
     }
 
-    return names.join(' > ');
+    return names.join(" > ");
   }
 
   private formatErrorMessage(test: TestCase): string {
-    const errors = test.errors();
+    const result = test.result();
+
+    if (result.state !== "failed") {
+      return "";
+    }
+
+    const errors = result.errors;
 
     if (errors.length === 0) {
-      return '';
+      return "";
     }
 
     return errors
-      .map((error) => {
+      .map((error: TestResultFailed["errors"][number]) => {
         const message =
           error?.message ??
-          (typeof error === 'string' ? error : 'Unknown error');
+          (typeof error === "string" ? error : "Unknown error");
         // Strip ANSI codes and truncate long messages
-        const cleanMessage = message
-          .replace(/\u001b\[\d+m/g, '')
-          .split('\n')[0]
-          .slice(0, 200);
+        let cleanMessage = message;
+        while (cleanMessage.includes("\u001B[")) {
+          const start = cleanMessage.indexOf("\u001B[");
+          const end = cleanMessage.indexOf("m", start);
+          if (end === -1) {
+            break;
+          }
+
+          cleanMessage =
+            cleanMessage.slice(0, start) + cleanMessage.slice(end + 1);
+        }
+
+        cleanMessage = cleanMessage.split("\n", 1)[0].slice(0, 200);
 
         return `> ${cleanMessage}`;
       })
-      .join('\n');
+      .join("\n");
   }
 }
